@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  backup-x:
+    image: dingba809/backup-x:latest
+    container_name: backup-x
+    restart: always
+    ports:
+      - "9977:9977"
+    volumes:
+      # 映射本机目录以持久化存储数据和备份文件
+      - ./backup-x-files:/app/backup-x-files
+      # [可选] 如果你需要备份宿主机的其他特定目录，可以通过这种方式映射进去：
+      # - /your/data/path:/opt/backup-data
+
+    environment:
+      - TZ=Asia/Shanghai
