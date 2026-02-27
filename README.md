@@ -13,7 +13,13 @@
   - [x] 支持加密关键信息(v1.3.0+)
 
 ## docker中使用
-- 运行docker容器（`/opt/backup-x-files`可替换为主机的目录）
+- 方式一：使用 docker-compose (推荐)
+  直接下载仓库中的 `docker-compose.yml` 或者新建该文件，然后运行：
+  ```shell
+  docker-compose up -d
+  ```
+
+- 方式二：使用 docker cli 运行（`/opt/backup-x-files`可替换为主机的数据目录）
   ```shell
   # 默认启动rclone的配置会保存到/app/backup-x-files/rclone/rclone.conf：
   
