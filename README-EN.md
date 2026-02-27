@@ -1,4 +1,4 @@
-# backup-x
+﻿# backup-x
   A database backup tool with web interfaces.
   - [x] Support custom commands.
   - [x] Obsolete files will be deleted automatically.
@@ -13,8 +13,8 @@
     --restart=always \
     -p 9977:9977 \
     -v /opt/backup-x-files:/app/backup-x-files \
-    jeessy/backup-x
+    dingba809/backup-x
   ```
 
-  ![avatar](https://raw.githubusercontent.com/jeessy2/backup-x/master/backup-x-web.png)
+  ![avatar](https://raw.githubusercontent.com/dingba809/backup-x/master/backup-x-web.png)
 

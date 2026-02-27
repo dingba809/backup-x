@@ -2,6 +2,7 @@ package main
 
 import (
 	"backup-x/client"
+	"backup-x/entity"
 	"backup-x/util"
 	"backup-x/web"
 	"embed"
@@ -82,15 +83,43 @@ func faviconFsFunc(writer http.ResponseWriter, request *http.Request) {
 }
 
 func run(firstDelay time.Duration) {
-	// 启动静态文件服务
-	http.HandleFunc("/static/", web.BasicAuth(staticFsFunc))
-	http.HandleFunc("/favicon.ico", web.BasicAuth(faviconFsFunc))
+	// 用户迁移（首次启动时从旧配置迁移）
+	entity.MigrateUsersFromConfig()
 
-	http.HandleFunc("/", web.BasicAuth(web.WritingConfig))
-	http.HandleFunc("/save", web.BasicAuth(web.Save))
-	http.HandleFunc("/logs", web.BasicAuth(web.Logs))
-	http.HandleFunc("/clearLog", web.BasicAuth(web.ClearLog))
-	http.HandleFunc("/webhookTest", web.BasicAuth(web.WebhookTest))
+	// 登录相关路由（无需认证）
+	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodPost {
+			web.LoginHandler(w, r)
+		} else {
+			web.LoginPage(w, r)
+		}
+	})
+	http.HandleFunc("/logout", web.LogoutHandler)
+
+	// 启动静态文件服务
+	http.HandleFunc("/static/", web.SessionAuth(staticFsFunc))
+	http.HandleFunc("/favicon.ico", faviconFsFunc)
+
+	// 主页面路由（需要认证）
+	http.HandleFunc("/", web.SessionAuth(web.WritingConfig))
+	http.HandleFunc("/save", web.SessionAuth(web.Save))
+	http.HandleFunc("/logs", web.SessionAuth(web.Logs))
+	http.HandleFunc("/clearLog", web.SessionAuth(web.ClearLog))
+	http.HandleFunc("/webhookTest", web.SessionAuth(web.WebhookTest))
+
+	// 用户管理路由（仅 admin 可访问）
+	http.HandleFunc("/users", web.AdminOnly(web.UserManagePage))
+	http.HandleFunc("/users/add", web.AdminOnly(web.UserAdd))
+	http.HandleFunc("/users/update", web.AdminOnly(web.UserUpdate))
+	http.HandleFunc("/users/delete", web.AdminOnly(web.UserDelete))
+
+	// 定期清理过期 session
+	go func() {
+		for {
+			time.Sleep(30 * time.Minute)
+			web.CleanExpiredSessions()
+		}
+	}()
 
 	// 改变工作目录
 	os.Chdir(*backupDir)

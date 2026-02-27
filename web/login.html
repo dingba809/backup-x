@@ -1,0 +1,451 @@
+﻿<html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="jie">
+  <title>Backup-X - 登录</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0f0f1a;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* 动态背景 */
+    .bg-gradient {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 80%, rgba(59, 130, 246, 0.15) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 50% at 80% 20%, rgba(139, 92, 246, 0.12) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 40% at 50% 50%, rgba(16, 185, 129, 0.06) 0%, transparent 70%);
+    }
+
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    /* 浮动光斑 */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.4;
+      animation: float 20s ease-in-out infinite;
+      z-index: 0;
+    }
+
+    .orb-1 {
+      width: 300px;
+      height: 300px;
+      background: rgba(59, 130, 246, 0.3);
+      top: -100px;
+      left: -50px;
+      animation-delay: 0s;
+    }
+
+    .orb-2 {
+      width: 250px;
+      height: 250px;
+      background: rgba(139, 92, 246, 0.25);
+      bottom: -80px;
+      right: -30px;
+      animation-delay: -7s;
+    }
+
+    .orb-3 {
+      width: 200px;
+      height: 200px;
+      background: rgba(16, 185, 129, 0.2);
+      top: 50%;
+      right: 20%;
+      animation-delay: -14s;
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translate(0, 0) scale(1);
+      }
+
+      25% {
+        transform: translate(30px, -40px) scale(1.05);
+      }
+
+      50% {
+        transform: translate(-20px, 20px) scale(0.95);
+      }
+
+      75% {
+        transform: translate(15px, 35px) scale(1.02);
+      }
+    }
+
+    /* 登录卡片 */
+    .login-container {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 440px;
+      padding: 0 20px;
+      animation: fadeInUp 0.6s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .login-card {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(40px);
+      -webkit-backdrop-filter: blur(40px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 48px 40px 40px;
+      box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.05) inset,
+        0 20px 60px rgba(0, 0, 0, 0.3),
+        0 0 40px rgba(59, 130, 246, 0.05);
+    }
+
+    /* Logo & 标题 */
+    .logo-section {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .logo-icon {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto 16px;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
+      position: relative;
+    }
+
+    .logo-icon::after {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.5), rgba(139, 92, 246, 0.5));
+      z-index: -1;
+      filter: blur(8px);
+      opacity: 0.6;
+    }
+
+    .logo-icon svg {
+      width: 28px;
+      height: 28px;
+      fill: #fff;
+    }
+
+    .logo-text {
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #e2e8f0, #ffffff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .logo-sub {
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.35);
+      margin-top: 4px;
+      font-weight: 400;
+      letter-spacing: 0.05em;
+    }
+
+    /* 错误提示 */
+    .error-msg {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      border-radius: 10px;
+      padding: 10px 16px;
+      margin-bottom: 20px;
+      color: #fca5a5;
+      font-size: 0.85rem;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      animation: shake 0.4s ease-in-out;
+    }
+
+    @keyframes shake {
+
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      20% {
+        transform: translateX(-6px);
+      }
+
+      40% {
+        transform: translateX(6px);
+      }
+
+      60% {
+        transform: translateX(-4px);
+      }
+
+      80% {
+        transform: translateX(4px);
+      }
+    }
+
+    .error-msg svg {
+      width: 16px;
+      height: 16px;
+      fill: #fca5a5;
+      flex-shrink: 0;
+    }
+
+    /* 表单 */
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.5);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .input-wrapper svg {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      fill: rgba(255, 255, 255, 0.25);
+      transition: fill 0.2s;
+      pointer-events: none;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 13px 16px 13px 44px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      color: #f1f5f9;
+      font-size: 0.95rem;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.25s ease;
+    }
+
+    .form-input::placeholder {
+      color: rgba(255, 255, 255, 0.2);
+    }
+
+    .form-input:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .form-input:focus {
+      border-color: rgba(59, 130, 246, 0.5);
+      background: rgba(59, 130, 246, 0.05);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 0 20px rgba(59, 130, 246, 0.05);
+    }
+
+    .form-input:focus+svg,
+    .input-wrapper:focus-within svg {
+      fill: rgba(59, 130, 246, 0.7);
+    }
+
+    /* 登录按钮 */
+    .btn-login {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #3b82f6, #6366f1, #8b5cf6);
+      background-size: 200% 200%;
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      margin-top: 8px;
+      letter-spacing: 0.05em;
+    }
+
+    .btn-login::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), transparent 50%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .btn-login:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 30px rgba(59, 130, 246, 0.35), 0 2px 8px rgba(99, 102, 241, 0.2);
+      background-position: 100% 0;
+    }
+
+    .btn-login:hover::before {
+      opacity: 1;
+    }
+
+    .btn-login:active {
+      transform: translateY(0);
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.25);
+    }
+
+    /* 底部 */
+    .footer-text {
+      text-align: center;
+      margin-top: 28px;
+      font-size: 0.78rem;
+      color: rgba(255, 255, 255, 0.2);
+    }
+
+    .footer-text a {
+      color: rgba(59, 130, 246, 0.6);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-text a:hover {
+      color: rgba(59, 130, 246, 0.9);
+    }
+
+    /* 响应式 */
+    @media (max-width: 480px) {
+      .login-card {
+        padding: 36px 28px 32px;
+        border-radius: 16px;
+      }
+
+      .logo-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+      }
+
+      .logo-text {
+        font-size: 1.4rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg-gradient"></div>
+  <div class="bg-grid"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <div class="login-container">
+    <div class="login-card">
+      <div class="logo-section">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z" />
+          </svg>
+        </div>
+        <div class="logo-text">Backup-X</div>
+        <div class="logo-sub">数据备份管理系统</div>
+      </div>
+
+      {{if .Error}}
+      <div class="error-msg">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
+        </svg>
+        {{.Error}}
+      </div>
+      {{end}}
+
+      <form method="POST" action="/login">
+        <div class="form-group">
+          <label class="form-label" for="username">用户名</label>
+          <div class="input-wrapper">
+            <input type="text" class="form-input" id="username" name="username" placeholder="请输入用户名" required autofocus>
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+            </svg>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="password">密码</label>
+          <div class="input-wrapper">
+            <input type="password" class="form-input" id="password" name="password" placeholder="请输入密码" required>
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
+            </svg>
+          </div>
+        </div>
+        <button type="submit" class="btn-login">登 录</button>
+      </form>
+
+      <div class="footer-text">
+        <a href="https://github.com/dingba809/backup-x" target="_blank">Backup-X</a> · 带Web界面的数据备份工具
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

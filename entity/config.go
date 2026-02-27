@@ -15,7 +15,8 @@ const parentSavePath = "backup-x-files"
 // Config yml格式的配置文件
 // go的实体需大写对应config.yml的key, key全部小写
 type Config struct {
-	User
+	Username   string // 保留用于迁移兼容
+	Password   string // 保留用于迁移兼容
 	BackupConfig []BackupConfig
 	Webhook
 	S3Config

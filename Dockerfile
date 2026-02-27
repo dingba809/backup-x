@@ -1,4 +1,4 @@
-# build stage
+﻿# build stage
 FROM golang:1.25 AS builder
 
 WORKDIR /app
@@ -25,7 +25,7 @@ FROM minio/mc:latest AS mc
 FROM debian:bookworm-slim
 
 LABEL name=backup-x
-LABEL url=https://github.com/jeessy2/backup-x
+LABEL url=https://github.com/dingba809/backup-x
 
 RUN apt-get -y update \
     && apt-get install -y wget curl gpg gnupg2 software-properties-common apt-transport-https lsb-release ca-certificates rsync lz4 zstd

@@ -1,451 +1,953 @@
-<html lang="zh-CN">
+﻿<html lang="zh-CN">
 
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="author" content="jie">
   <title>Backup-X</title>
-  <!-- Bootstrap CSS -->
-  <link rel="stylesheet" href="/static/bootstrap.min.css">
-  <link rel="stylesheet" href="/static/common.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="/static/jquery-3.5.1.min.js"></script>
-  <script src="/static/bootstrap.min.js"></script>
-  <script src="/static/layer/layer.js"></script>
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0f0f1a;
+      color: #e2e8f0;
+      min-height: 100vh
+    }
+
+    /* 背景 */
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background-image: linear-gradient(rgba(255, 255, 255, .015) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, .015) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none
+    }
+
+    .bg-gradient {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background: radial-gradient(ellipse 80% 60% at 10% 90%, rgba(59, 130, 246, .1) 0%, transparent 70%), radial-gradient(ellipse 60% 50% at 90% 10%, rgba(139, 92, 246, .08) 0%, transparent 70%);
+      pointer-events: none
+    }
+
+    /* 导航栏 */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      height: 56px;
+      background: rgba(15, 15, 26, .85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, .06)
+    }
+
+    .navbar-brand {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #fff;
+      text-decoration: none;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 20px
+    }
+
+    .nav-links a {
+      color: rgba(255, 255, 255, .5);
+      text-decoration: none;
+      font-size: .85rem;
+      font-weight: 500;
+      transition: color .2s
+    }
+
+    .nav-links a:hover {
+      color: rgba(255, 255, 255, .9)
+    }
+
+    .nav-links a.active {
+      color: #fbbf24
+    }
+
+    .nav-links .nav-version {
+      background: rgba(255, 255, 255, .08);
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: .75rem;
+      color: rgba(255, 255, 255, .4)
+    }
+
+    /* 主内容 */
+    .main-wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      margin: 24px auto;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 24px
+    }
+
+    @media(max-width:992px) {
+      .main-wrap {
+        grid-template-columns: 1fr
+      }
+    }
+
+    /* 卡片 */
+    .card {
+      background: rgba(255, 255, 255, .03);
+      border: 1px solid rgba(255, 255, 255, .06);
+      border-radius: 14px;
+      overflow: hidden;
+      backdrop-filter: blur(10px)
+    }
+
+    .card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, .06);
+      font-size: .95rem;
+      font-weight: 600;
+      color: #f1f5f9
+    }
+
+    .card-body {
+      padding: 20px
+    }
+
+    /* 按钮组 */
+    .btn-group-top {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 20px
+    }
+
+    .btn {
+      padding: 9px 18px;
+      border: none;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: .85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #3b82f6, #6366f1);
+      color: #fff
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 4px 20px rgba(59, 130, 246, .35);
+      transform: translateY(-1px)
+    }
+
+    .btn-warning {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #fff
+    }
+
+    .btn-warning:hover {
+      box-shadow: 0 4px 20px rgba(245, 158, 11, .35);
+      transform: translateY(-1px)
+    }
+
+    .btn-sm {
+      padding: 6px 14px;
+      font-size: .8rem;
+      border-radius: 8px
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, .12);
+      color: rgba(255, 255, 255, .6)
+    }
+
+    .btn-outline:hover {
+      background: rgba(255, 255, 255, .06);
+      color: #fff
+    }
+
+    .btn-outline-danger {
+      background: transparent;
+      border: 1px solid rgba(239, 68, 68, .3);
+      color: #fca5a5
+    }
+
+    .btn-outline-danger:hover {
+      background: rgba(239, 68, 68, .1)
+    }
+
+    /* 提示 */
+    .alert {
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-size: .85rem;
+      margin-bottom: 16px;
+      display: none;
+      animation: fadeIn .3s
+    }
+
+    .alert-success {
+      background: rgba(16, 185, 129, .1);
+      border: 1px solid rgba(16, 185, 129, .2);
+      color: #6ee7b7
+    }
+
+    .alert-danger {
+      background: rgba(239, 68, 68, .1);
+      border: 1px solid rgba(239, 68, 68, .2);
+      color: #fca5a5
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-8px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    /* Tab 导航 */
+    .tab-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      padding: 4px;
+      background: rgba(255, 255, 255, .03);
+      border-radius: 10px;
+      margin-bottom: 16px
+    }
+
+    .tab-item {
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: .8rem;
+      font-weight: 500;
+      color: rgba(255, 255, 255, .4);
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      transition: all .2s;
+      white-space: nowrap;
+      font-family: inherit
+    }
+
+    .tab-item:hover {
+      color: rgba(255, 255, 255, .7);
+      background: rgba(255, 255, 255, .04)
+    }
+
+    .tab-item.active {
+      background: rgba(59, 130, 246, .15);
+      color: #93c5fd
+    }
+
+    .tab-item .badge-disabled {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: .65rem;
+      background: rgba(245, 158, 11, .15);
+      color: #fbbf24;
+      margin-left: 4px
+    }
+
+    .tab-content {
+      display: none
+    }
+
+    .tab-content.active {
+      display: block
+    }
+
+    /* 表单 */
+    .form-row {
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      align-items: start;
+      gap: 12px;
+      margin-bottom: 16px
+    }
+
+    .form-row-half {
+      display: grid;
+      grid-template-columns: 100px 1fr 100px 1fr;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px
+    }
+
+    @media(max-width:768px) {
+      .form-row-half {
+        grid-template-columns: 100px 1fr
+      }
+    }
+
+    .form-label {
+      font-size: .8rem;
+      font-weight: 500;
+      color: rgba(255, 255, 255, .45);
+      padding-top: 10px;
+      text-transform: uppercase;
+      letter-spacing: .04em
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, .04);
+      border: 1px solid rgba(255, 255, 255, .08);
+      border-radius: 10px;
+      color: #f1f5f9;
+      font-size: .9rem;
+      font-family: inherit;
+      outline: none;
+      transition: all .2s
+    }
+
+    .form-control:hover {
+      border-color: rgba(255, 255, 255, .15);
+      background: rgba(255, 255, 255, .06)
+    }
+
+    .form-control:focus {
+      border-color: rgba(59, 130, 246, .5);
+      background: rgba(59, 130, 246, .04);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, .08)
+    }
+
+    .form-control::placeholder {
+      color: rgba(255, 255, 255, .2)
+    }
+
+    textarea.form-control {
+      resize: vertical;
+      min-height: 80px;
+      font-family: 'Cascadia Code', 'Fira Code', monospace, 'Inter', sans-serif;
+      font-size: .82rem;
+      line-height: 1.6
+    }
+
+    select.form-control {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23999' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      background-size: 18px;
+      padding-right: 32px
+    }
+
+    select.form-control option {
+      background: #1a1a2e;
+      color: #e2e8f0
+    }
+
+    .form-help {
+      font-size: .75rem;
+      color: rgba(255, 255, 255, .3);
+      margin-top: 4px;
+      line-height: 1.5
+    }
+
+    .form-help a {
+      color: rgba(59, 130, 246, .6);
+      text-decoration: none
+    }
+
+    .form-help a:hover {
+      color: rgba(59, 130, 246, .9)
+    }
+
+    /* 脚本生成器 */
+    .script-gen {
+      margin-top: 8px;
+      padding: 12px 16px;
+      background: rgba(59, 130, 246, .04);
+      border: 1px solid rgba(59, 130, 246, .1);
+      border-radius: 10px
+    }
+
+    .script-gen-title {
+      font-size: .78rem;
+      font-weight: 600;
+      color: rgba(59, 130, 246, .7);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px
+    }
+
+    .script-gen-title svg {
+      width: 14px;
+      height: 14px;
+      fill: rgba(59, 130, 246, .7)
+    }
+
+    .script-gen-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 8px
+    }
+
+    .script-gen-row.full {
+      grid-template-columns: 1fr 1fr
+    }
+
+    @media(max-width:768px) {
+      .script-gen-row {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .sg-input {
+      padding: 8px 10px;
+      background: rgba(255, 255, 255, .04);
+      border: 1px solid rgba(255, 255, 255, .08);
+      border-radius: 8px;
+      color: #f1f5f9;
+      font-size: .8rem;
+      font-family: inherit;
+      outline: none;
+      transition: all .2s;
+      width: 100%
+    }
+
+    .sg-input:focus {
+      border-color: rgba(59, 130, 246, .4);
+      background: rgba(59, 130, 246, .04)
+    }
+
+    .sg-input::placeholder {
+      color: rgba(255, 255, 255, .2)
+    }
+
+    .sg-select {
+      padding: 8px 10px;
+      background: rgba(255, 255, 255, .04);
+      border: 1px solid rgba(255, 255, 255, .08);
+      border-radius: 8px;
+      color: #f1f5f9;
+      font-size: .8rem;
+      font-family: inherit;
+      outline: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23666' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      background-size: 16px;
+      padding-right: 28px;
+      width: 100%;
+      cursor: pointer
+    }
+
+    .sg-select option {
+      background: #1a1a2e;
+      color: #e2e8f0
+    }
+
+    .btn-generate {
+      padding: 7px 16px;
+      background: linear-gradient(135deg, #3b82f6, #6366f1);
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-size: .78rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all .2s
+    }
+
+    .btn-generate:hover {
+      box-shadow: 0 2px 12px rgba(59, 130, 246, .3);
+      transform: translateY(-1px)
+    }
+
+    /* 日志面板 */
+    .log-panel {
+      position: sticky;
+      top: 80px
+    }
+
+    .log-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 12px;
+      padding: 3px;
+      background: rgba(255, 255, 255, .03);
+      border-radius: 8px
+    }
+
+    .log-tab {
+      flex: 1;
+      padding: 6px 0;
+      text-align: center;
+      font-size: .78rem;
+      font-weight: 500;
+      color: rgba(255, 255, 255, .35);
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      border-radius: 6px;
+      transition: all .2s;
+      font-family: inherit
+    }
+
+    .log-tab:hover {
+      color: rgba(255, 255, 255, .6)
+    }
+
+    .log-tab.active {
+      background: rgba(59, 130, 246, .15);
+      color: #93c5fd
+    }
+
+    .log-content {
+      font-size: .78rem;
+      line-height: 1.8;
+      color: rgba(255, 255, 255, .5);
+      max-height: 600px;
+      overflow-y: auto;
+      word-break: break-all
+    }
+
+    .log-content::-webkit-scrollbar {
+      width: 4px
+    }
+
+    .log-content::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, .1);
+      border-radius: 2px
+    }
+
+    .log-stats {
+      font-size: .75rem;
+      color: rgba(255, 255, 255, .35);
+      margin-bottom: 12px;
+      line-height: 1.8
+    }
+  </style>
 </head>
 
 <body>
-  <header>
-    <div class="navbar navbar-dark bg-dark shadow-sm">
-      <div class="container d-flex justify-content-between">
-        <a href="/" class="navbar-brand d-flex align-items-center">
-          <strong>Backup-X</strong>
-        </a>
-        <a href="https://github.com/jeessy2/backup-x" target="_blank" style="color: white">
-          <strong>Github | Backup-X</strong>
-          <span class="badge badge-secondary">
-            {{.Version}}
-          </span>
-        </a>
-      </div>
+  <div class="bg-grid"></div>
+  <div class="bg-gradient"></div>
+
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">Backup-X</a>
+    <div class="nav-links">
+      <a href="https://github.com/dingba809/backup-x" target="_blank">Github <span
+          class="nav-version">{{.Version}}</span></a>
+      {{if eq .CurrentRole "admin"}}
+      <a href="/users">用户管理</a>
+      {{end}}
+      <a href="/logout">退出 ({{.CurrentUser}})</a>
     </div>
-  </header>
-  
-  <main role="main" style="margin-top: 30px">
-    <div class="row">
-      <div class="col-md-6 offset-md-3">
-        <form>
+  </nav>
 
-          <button class="btn btn-primary submit_btn" style="margin-bottom: 15px;">Save</button>
-          <button class="btn btn-primary submit_btn_backup_idx" style="margin-bottom: 15px;margin-left: 15px;">Save & 立即备份选中</button>
-          <button class="btn btn-warning submit_btn_backup_all" style="margin-bottom: 15px;margin-left: 15px;">Save & 立即备份全部</button>
-
-          <div class="alert" style="display: none;">
-            <strong id="resultMsg"></strong>
-          </div>
-
-          <div class="portlet">
-            <h5 class="portlet__head">备份设置</h5>
-            <div class="portlet__body">
-              <nav>
-                <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                  {{range $i, $v := .BackupConfig}}
-                  <a class="nav-item nav-link {{if eq $i 0}}active{{end}}" id="id_{{$i}}" data-toggle="tab" href="#content_{{$i}}" onclick="contentChange('{{$i}}')" role="tab">
-                    {{if eq $v.ProjectName ""}}
-                    {{$i}}
-                    {{else}}
-                    {{$v.ProjectName}}
-                    {{end}}
-                    {{if ne $v.Enabled 0}}
-                    <span class="badge badge-pill badge-warning">停用</span>
-                    {{end}}
-                  </a>
-                  {{end}}
-                </div>
-              </nav>
-              <div class="tab-content" id="nav-tabContent">
-                {{range $i, $v := .BackupConfig}}
-                <div class="tab-pane fade {{if eq $i 0}}show active{{end}}" id="content_{{$i}}" role="tabpanel">
-                  <br/>
-                  <div class="form-group row">
-                    <label for="ProjectName_{{$i}}" class="col-sm-2 col-form-label">项目名称</label>
-                    <div class="col-sm-10">
-                      <input class="form-control" name="ProjectName" id="ProjectName_{{$i}}" rows="3" value="{{$v.ProjectName}}" onchange="projectNameChange(this)" aria-describedby="ProjectName_help">
-                      <small id="ProjectName_help" class="form-text text-muted">请输入项目名称，一般取数据库名称，并确保名称不重复</small>
-                    </div>
-                  </div>
-            
-                  <div class="form-group row">
-                    <label for="Command_{{$i}}" class="col-sm-2 col-form-label">备份脚本</label>
-                    <div class="col-sm-10">
-                      <textarea class="form-control" name="Command" id="Command_{{$i}}" rows="3" aria-describedby="Command_help">{{$v.Command}}</textarea>
-                      <small id="Command_help" class="form-text text-muted">
-                        日期变量 #{DATE} ,密码变量 #{PWD} ,对象存储变量: #{Endpoint} #{AccessKey} #{SecretKey} #{BucketName}
-                        <br/>例: mysqldump -h192.168.1.11 -uroot -p#{PWD} db-name > #{DATE}.sql <a target="blank" href="https://github.com/jeessy2/backup-x#备份脚本参考">备份脚本参考</a> 
-                      </small>
-                    </div>
-                  </div>
-
-                  <div class="form-group row">
-                    <label for="Pwd_{{$i}}" class="col-sm-2 col-form-label">密码变量</label>
-                    <div class="col-sm-10">
-                      <input type="password" class="form-control" name="Pwd" id="Pwd_{{$i}}" value="{{$v.Pwd}}">
-                    </div>
-                  </div>
-
-                  <div class="form-group row">
-                    <label for="Enabled_{{$i}}" class="col-sm-2">是否启用</label>
-                    <div class="col-sm-4">
-                      <select class="form-control" name="Enabled" id="Enabled_{{$i}}" value="{{$v.Enabled}}" onchange="enabledChange(this)">
-                        <option value="0" {{if eq $v.Enabled 0}}selected{{end}}>启用</option>
-                        <option value="1" {{if eq $v.Enabled 1}}selected{{end}}>停用</option>
-                      </select>
-                    </div>
-                    <label for="BackupType_{{$i}}" class="col-sm-2">备份类型</label>
-                    <div class="col-sm-4">
-                      <select class="form-control" name="BackupType" id="BackupType_{{$i}}" value="{{$v.BackupType}}">
-                        <option value="0" {{if eq $v.BackupType 0}}selected{{end}}>备份数据库</option>
-                        <option value="1" {{if eq $v.BackupType 1}}selected{{end}}>同步文件</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div class="form-group row">
-                    <label for="SaveDays_{{$i}}" class="col-sm-2 col-form-label">本地保存(天)</label>
-                    <div class="col-sm-4">
-                      <input type="number" class="form-control" name="SaveDays" id="SaveDays_{{$i}}" value="{{$v.SaveDays}}" min="1">
-                    </div>
-                    <label for="SaveDaysS3_{{$i}}" class="col-sm-2 col-form-label">对象存储保存(天)</label>
-                    <div class="col-sm-4">
-                      <input type="number" class="form-control" name="SaveDaysS3" id="SaveDaysS3_{{$i}}" value="{{$v.SaveDaysS3}}" min="1">
-                    </div>
-                  </div>
-
-                  <div class="form-group row">
-                    <label for="StartTime_{{$i}}" class="col-sm-2 col-form-label">备份起始时间</label>
-                    <div class="col-sm-4">
-                      <select class="form-control" name="StartTime" id="StartTime_{{$i}}" value="{{$v.StartTime}}">
-                        <option value="0" {{if eq $v.StartTime 0}}selected{{end}}>0:00</option>
-                        <option value="1" {{if eq $v.StartTime 1}}selected{{end}}>1:00</option>
-                        <option value="2" {{if eq $v.StartTime 2}}selected{{end}}>2:00</option>
-                        <option value="3" {{if eq $v.StartTime 3}}selected{{end}}>3:00</option>
-                        <option value="4" {{if eq $v.StartTime 4}}selected{{end}}>4:00</option>
-                        <option value="5" {{if eq $v.StartTime 5}}selected{{end}}>5:00</option>
-                        <option value="6" {{if eq $v.StartTime 6}}selected{{end}}>6:00</option>
-                        <option value="7" {{if eq $v.StartTime 7}}selected{{end}}>7:00</option>
-                        <option value="8" {{if eq $v.StartTime 8}}selected{{end}}>8:00</option>
-                        <option value="9" {{if eq $v.StartTime 9}}selected{{end}}>9:00</option>
-                        <option value="10" {{if eq $v.StartTime 10}}selected{{end}}>10:00</option>
-                        <option value="11" {{if eq $v.StartTime 11}}selected{{end}}>11:00</option>
-                        <option value="12" {{if eq $v.StartTime 12}}selected{{end}}>12:00</option>
-                        <option value="13" {{if eq $v.StartTime 13}}selected{{end}}>13:00</option>
-                        <option value="14" {{if eq $v.StartTime 14}}selected{{end}}>14:00</option>
-                        <option value="15" {{if eq $v.StartTime 15}}selected{{end}}>15:00</option>
-                        <option value="16" {{if eq $v.StartTime 16}}selected{{end}}>16:00</option>
-                        <option value="17" {{if eq $v.StartTime 17}}selected{{end}}>17:00</option>
-                        <option value="18" {{if eq $v.StartTime 18}}selected{{end}}>18:00</option>
-                        <option value="19" {{if eq $v.StartTime 19}}selected{{end}}>19:00</option>
-                        <option value="20" {{if eq $v.StartTime 20}}selected{{end}}>20:00</option>
-                        <option value="21" {{if eq $v.StartTime 21}}selected{{end}}>21:00</option>
-                        <option value="22" {{if eq $v.StartTime 22}}selected{{end}}>22:00</option>
-                        <option value="23" {{if eq $v.StartTime 23}}selected{{end}}>23:00</option>
-                      </select>
-                    </div>
-                    <label for="Period_{{$i}}" class="col-sm-2 col-form-label">备份周期(分钟)</label>
-                    <div class="col-sm-4">
-                      <input type="number" class="form-control" name="Period" id="Period_{{$i}}" value="{{$v.Period}}" min="1">
-                    </div>
-                  </div>
-
-                </div>
-                {{end}}
-              </div>
-
-            </div>
-          </div>
-
-          <div class="portlet">
-            <h5 class="portlet__head">服务配置</h5>
-            <div class="portlet__body">
-
-              <div class="form-group row">
-                <label for="Username" class="col-sm-2 col-form-label">登录用户名</label>
-                <div class="col-sm-10">
-                  <input class="form-control" name="Username" id="Username" value="{{.Username}}" aria-describedby="Username_help" required>
-                  <small id="Username_help" class="form-text text-muted">必须输入</small>
-                </div>
-              </div>
-
-              <div class="form-group row">
-                <label for="Password" class="col-sm-2 col-form-label">登录密码</label>
-                <div class="col-sm-10">
-                  <input class="form-control" type="password" name="Password" id="Password" value="{{.Password}}" aria-describedby="password_help" required>
-                  <small id="password_help" class="form-text text-muted">必须输入</small>
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-          <div class="portlet">
-            <h5 class="portlet__head">Webhook通知</h5>
-            <div class="portlet__body">
-
-              <div class="form-group row">
-                <label for="WebhookURL" class="col-sm-2 col-form-label">URL</label>
-                <div class="col-sm-10">
-                  <input class="form-control" name="WebhookURL" id="WebhookURL" value="{{.WebhookURL}}" aria-describedby="WebhookURL_help">
-                  <small id="WebhookURL_help" class="form-text text-muted">
-                    <a target="blank" href="https://github.com/jeessy2/backup-x#webhook">点击参考官方Webhook说明</a><br/>
-                    支持的变量#{projectName}, #{fileName}, #{fileSize}, #{result}, 
-                  </small>
-                </div>
-              </div>
-
-              <div class="form-group row">
-                <label for="WebhookRequestBody" class="col-sm-2 col-form-label">RequestBody</label>
-                <div class="col-sm-10">
-                  <textarea class="form-control" id="WebhookRequestBody" name="WebhookRequestBody" rows="3" aria-describedby="WebhookRequestBody_help">
-{{- .WebhookRequestBody -}}
-                  </textarea>
-                  <small id="WebhookRequestBody_help" class="form-text text-muted">
-                    RequestBody为空GET请求，不为空POST请求。支持的变量同上
-                  </small>
-                </div>
-              </div>
-
-              <div class="form-group row">
-                <label class="col-sm-2 col-form-label"></label>
-                <div class="col-sm-10">
-                  <button class="btn btn-primary btn-sm" id="webhookTestBtn" aria-describedby="webhookTestBtn_help">模拟测试Webhook</button>
-                  <small id="webhookTestBtn_help" class="form-text text-muted"></small>
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-          <div class="portlet">
-            <h5 class="portlet__head">对象存储配置</h5>
-            <div class="portlet__body">
-
-              <div class="form-group row">
-                <label for="Endpoint" class="col-sm-2 col-form-label">Endpoint</label>
-                <div class="col-sm-10">
-                  <input class="form-control" name="Endpoint" id="Endpoint" value="{{.Endpoint}}" aria-describedby="Endpoint_help">
-                </div>
-              </div>
-
-              <div class="form-group row">
-                <label for="AccessKey" class="col-sm-2 col-form-label">AccessKey</label>
-                <div class="col-sm-10">
-                  <input class="form-control" name="AccessKey" id="AccessKey" value="{{.AccessKey}}" aria-describedby="AccessKey_help">
-                </div>
-              </div>
-
-              <div class="form-group row">
-                <label for="SecretKey" class="col-sm-2 col-form-label">SecretKey</label>
-                <div class="col-sm-10">
-                  <input class="form-control" type="password" name="SecretKey" id="SecretKey" value="{{.SecretKey}}" aria-describedby="SecretKey_help">
-                </div>
-              </div>
-
-              <div class="form-group row">
-                <label for="BucketName" class="col-sm-2 col-form-label">BucketName</label>
-                <div class="col-sm-10">
-                  <input class="form-control" name="BucketName" id="BucketName" value="{{.BucketName}}" aria-describedby="BucketName_help">
-                </div>
-              </div>
-
-              <div class="form-group row">
-                <label for="Region" class="col-sm-2 col-form-label">Region</label>
-                <div class="col-sm-10">
-                  <input class="form-control" name="Region" id="Region" value="{{.Region}}" aria-describedby="Region_help">
-                  <small id="Region_help" class="form-text text-muted">可选，如果为空将自动从 Endpoint 推断区域，默认使用 cn-north-1</small>
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-          <button class="btn btn-primary submit_btn" style="margin-bottom: 15px;">Save</button>
-          <button class="btn btn-primary submit_btn_backup_idx" style="margin-bottom: 15px;margin-left: 15px;">Save & 立即备份选中</button>
-          <button class="btn btn-warning submit_btn_backup_all" style="margin-bottom: 15px;margin-left: 15px;">Save & 立即备份全部</button>
-        </form>
-      </div>
-
-      <div class="col-md-3">
-        <div class="nav nav-tabs" role="tablist" style="margin-top: 50px;">
-          <a class="nav-item nav-link active" href="#x0" data-toggle="tab" onclick="changeLog(1)" role="tab">
-            备份日志
-          </a>
-          <a class="nav-item nav-link" href="#x1" data-toggle="tab" onclick="changeLog(2)" role="tab">
-            登录日志
-          </a>
-          <a class="nav-item nav-link" href="#x2" data-toggle="tab" onclick="changeLog(0)" role="tab">
-            全部日志
-          </a>
+  <div class="main-wrap">
+    <div>
+      <form id="mainForm">
+        <div class="btn-group-top">
+          <button class="btn btn-primary submit_btn" type="button">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
+              <polyline points="17 21 17 13 7 13 7 21" />
+              <polyline points="7 3 7 8 15 8" />
+            </svg>
+            保存
+          </button>
+          <button class="btn btn-primary submit_btn_backup_idx" type="button">保存并备份选中</button>
+          <button class="btn btn-warning submit_btn_backup_all" type="button">保存并备份全部</button>
         </div>
-        
-        <p class="font-weight-light text-break" style="margin-top: 10px;font-size: 13px;" id="logs"></p>
-        <button type="button" class="btn btn-outline-primary btn-sm" id="clearLogBtn">清空日志</button>
-      </div>
+
+        <div class="alert" id="alertBox"><strong id="resultMsg"></strong></div>
+
+        <!-- 备份设置 -->
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-head">
+            <span>备份设置</span>
+          </div>
+          <div class="card-body">
+            <div class="tab-nav" id="tabNav">
+              {{range $i, $v := .BackupConfig}}
+              <button type="button" class="tab-item {{if eq $i 0}}active{{end}}" data-idx="{{$i}}"
+                onclick="switchTab({{$i}})">
+                {{if eq $v.ProjectName ""}}{{$i}}{{else}}{{$v.ProjectName}}{{end}}
+                {{if ne $v.Enabled 0}}<span class="badge-disabled">停用</span>{{end}}
+              </button>
+              {{end}}
+            </div>
+
+            {{range $i, $v := .BackupConfig}}
+            <div class="tab-content {{if eq $i 0}}active{{end}}" id="tabContent_{{$i}}">
+              <div class="form-row">
+                <label class="form-label">项目名称</label>
+                <div>
+                  <input class="form-control" name="ProjectName" id="ProjectName_{{$i}}" value="{{$v.ProjectName}}"
+                    onchange="projectNameChange(this)" placeholder="请输入项目名称">
+                  <div class="form-help">一般取数据库名称，确保名称不重复</div>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <label class="form-label">备份脚本</label>
+                <div>
+                  <textarea class="form-control" name="Command" id="Command_{{$i}}" rows="3"
+                    placeholder="输入备份命令或使用下方脚本生成器">{{$v.Command}}</textarea>
+                  <div class="form-help">
+                    变量: #{DATE} #{PWD} #{Endpoint} #{AccessKey} #{SecretKey} #{BucketName}
+                    | <a href="https://github.com/dingba809/backup-x#备份脚本参考" target="_blank">脚本参考</a>
+                  </div>
+
+                  <!-- 脚本生成器 -->
+                  <div class="script-gen">
+                    <div class="script-gen-title">
+                      <svg viewBox="0 0 24 24">
+                        <path
+                          d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z" />
+                      </svg>
+                      脚本生成器
+                    </div>
+                    <div class="script-gen-row">
+                      <select class="sg-select" id="sgType_{{$i}}" onchange="sgTypeChange({{$i}})">
+                        <option value="">选择数据库类型</option>
+                        <option value="mysql">MySQL / MariaDB</option>
+                        <option value="mysql_all">MySQL 全库</option>
+                        <option value="postgres">PostgreSQL 单库</option>
+                        <option value="postgres_all">PostgreSQL 全库</option>
+                        <option value="mongodb">MongoDB</option>
+                        <option value="mongodb_all">MongoDB 全库</option>
+                        <option value="redis">Redis</option>
+                        <option value="sqlite">SQLite</option>
+                        <option value="file_tar">文件打包 (tar.gz)</option>
+                        <option value="file_sync">文件同步 (rsync)</option>
+                      </select>
+                      <input class="sg-input" id="sgHost_{{$i}}" placeholder="主机地址 (127.0.0.1)">
+                      <input class="sg-input" id="sgPort_{{$i}}" placeholder="端口 (自动)">
+                    </div>
+                    <div class="script-gen-row full">
+                      <input class="sg-input" id="sgUser_{{$i}}" placeholder="用户名 (root)">
+                      <input class="sg-input" id="sgDbName_{{$i}}" placeholder="数据库名 / 文件路径">
+                    </div>
+                    <div style="display:flex;gap:8px;align-items:center;margin-top:4px">
+                      <select class="sg-select" id="sgFormat_{{$i}}" style="width:auto">
+                        <option value="sql">SQL 格式</option>
+                        <option value="custom">Custom 格式</option>
+                        <option value="archive">归档格式</option>
+                      </select>
+                      <button type="button" class="btn-generate" onclick="generateScript({{$i}})">生成脚本</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <label class="form-label">密码变量</label>
+                <input type="password" class="form-control" name="Pwd" id="Pwd_{{$i}}" value="{{$v.Pwd}}"
+                  placeholder="#{PWD} 变量的值">
+              </div>
+
+              <div class="form-row-half">
+                <label class="form-label">是否启用</label>
+                <select class="form-control" name="Enabled" id="Enabled_{{$i}}" onchange="enabledChange(this)">
+                  <option value="0" {{if eq $v.Enabled 0}}selected{{end}}>启用</option>
+                  <option value="1" {{if eq $v.Enabled 1}}selected{{end}}>停用</option>
+                </select>
+                <label class="form-label">备份类型</label>
+                <select class="form-control" name="BackupType" id="BackupType_{{$i}}">
+                  <option value="0" {{if eq $v.BackupType 0}}selected{{end}}>备份数据库</option>
+                  <option value="1" {{if eq $v.BackupType 1}}selected{{end}}>同步文件</option>
+                </select>
+              </div>
+
+              <div class="form-row-half">
+                <label class="form-label">本地保存</label>
+                <input type="number" class="form-control" name="SaveDays" id="SaveDays_{{$i}}" value="{{$v.SaveDays}}"
+                  min="1" placeholder="天">
+                <label class="form-label">对象存储</label>
+                <input type="number" class="form-control" name="SaveDaysS3" id="SaveDaysS3_{{$i}}"
+                  value="{{$v.SaveDaysS3}}" min="1" placeholder="天">
+              </div>
+
+              <div class="form-row-half">
+                <label class="form-label">起始时间</label>
+                <select class="form-control" name="StartTime" id="StartTime_{{$i}}">
+                  {{range $h := $.Hours}}
+                  <option value="{{$h}}" {{if eq $v.StartTime $h}}selected{{end}}>{{$h}}:00</option>
+                  {{end}}
+                </select>
+                <label class="form-label">周期(分)</label>
+                <input type="number" class="form-control" name="Period" id="Period_{{$i}}" value="{{$v.Period}}"
+                  min="1">
+              </div>
+            </div>
+            {{end}}
+          </div>
+        </div>
+
+        <!-- Webhook -->
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-head">Webhook 通知</div>
+          <div class="card-body">
+            <div class="form-row">
+              <label class="form-label">URL</label>
+              <div>
+                <input class="form-control" name="WebhookURL" id="WebhookURL" value="{{.WebhookURL}}"
+                  placeholder="https://...">
+                <div class="form-help"><a href="https://github.com/dingba809/backup-x#webhook" target="_blank">参考文档</a> |
+                  变量: #{projectName} #{fileName} #{fileSize} #{result}</div>
+              </div>
+            </div>
+            <div class="form-row">
+              <label class="form-label">Body</label>
+              <div>
+                <textarea class="form-control" name="WebhookRequestBody" id="WebhookRequestBody" rows="3"
+                  placeholder="为空时发送GET请求，填写后发送POST请求">{{.WebhookRequestBody}}</textarea>
+              </div>
+            </div>
+            <div class="form-row">
+              <label class="form-label"></label>
+              <div>
+                <button type="button" class="btn btn-sm btn-outline" id="webhookTestBtn">模拟测试</button>
+                <span class="form-help" id="webhookTestBtn_help" style="margin-left:8px"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 对象存储 -->
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-head">对象存储配置</div>
+          <div class="card-body">
+            <div class="form-row"><label class="form-label">Endpoint</label><input class="form-control" name="Endpoint"
+                id="Endpoint" value="{{.Endpoint}}"></div>
+            <div class="form-row"><label class="form-label">AccessKey</label><input class="form-control"
+                name="AccessKey" id="AccessKey" value="{{.AccessKey}}"></div>
+            <div class="form-row"><label class="form-label">SecretKey</label><input type="password" class="form-control"
+                name="SecretKey" id="SecretKey" value="{{.SecretKey}}"></div>
+            <div class="form-row"><label class="form-label">Bucket</label><input class="form-control" name="BucketName"
+                id="BucketName" value="{{.BucketName}}"></div>
+            <div class="form-row"><label class="form-label">Region</label>
+              <div><input class="form-control" name="Region" id="Region" value="{{.Region}}"
+                  placeholder="可选，默认 cn-north-1">
+                <div class="form-help">为空时自动从 Endpoint 推断</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="btn-group-top">
+          <button class="btn btn-primary submit_btn" type="button">保存</button>
+          <button class="btn btn-primary submit_btn_backup_idx" type="button">保存并备份选中</button>
+          <button class="btn btn-warning submit_btn_backup_all" type="button">保存并备份全部</button>
+        </div>
+      </form>
     </div>
 
-  </main>
+    <!-- 日志 -->
+    <div>
+      <div class="card log-panel">
+        <div class="card-head">运行日志</div>
+        <div class="card-body">
+          <div class="log-tabs">
+            <button type="button" class="log-tab active" onclick="changeLog(1,this)">备份</button>
+            <button type="button" class="log-tab" onclick="changeLog(2,this)">登录</button>
+            <button type="button" class="log-tab" onclick="changeLog(0,this)">全部</button>
+          </div>
+          <div class="log-stats" id="logStats"></div>
+          <div class="log-content" id="logs"></div>
+          <button type="button" class="btn btn-sm btn-outline" id="clearLogBtn" style="margin-top:12px">清空日志</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script>
-    let contentIdx = 0
-    let logType = 1
-    let logList = [] // 0：所有日志；1：日常日志；2：登录日志
+    let contentIdx = 0, logType = 1, logList = [];
 
-    function contentChange(i) {
-      contentIdx = i
-    }
-    
-    function changeLog(type = 0) {
-      logType = type
-      const curLogList = logList[logType]
-      const totalLogList = logList[0]
-      
-      const queryPageCount = totalLogList.filter(one => one.includes('请求登录')).length
-      const failedCount = totalLogList.filter(one => one.includes('登录失败')).length
-      const backupCount = totalLogList.filter(one => one.includes('正在备份项目')).length
-      
-      const html = `备份执行次数：${backupCount}次<br/>`+
-                    `历史页面访问次数：${queryPageCount}<br/>` +
-                    `历史登录失败：${failedCount}个<br/>` +
-              
-                    `<br/>` + curLogList.join('<br/>')
-      $("#logs").html(html)
-    }
-    
-    function showLayer(target) {
-      let oriTip = target.getAttribute('tip')
-      const newTip = oriTip.split('\n').join('<br/>')
-      const message = newTip
-              .replace(/(\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}:\d{2}\s*INFO\s*:)/gm, '<span style="color: #d8d8d8">$1</span>')
-              .replace(/(\d{4}\/\\d{2}\/\d{2} \d{2}:\d{2}:\d{2}\s*ERROR\s*:)/gm, '<span style="color: #f12e2e">$1</span>')
-      layer.open({
-        type: 1, // page 层类型
-        area: ['800px', '600px'],
-        title: '运行信息',
-        offset: '8%',
-        shade: 0.6, // 遮罩透明度
-        shadeClose: true, // 点击遮罩区域，关闭弹层
-        maxmin: true, // 允许全屏最小化
-        anim: 0, // 0-6 的动画形式，-1 不开启
-        content: `<div style="padding: 10px 20px; font-size: 14px;line-height: 26px;">${message}</div>`
-      });
+    // Tab 切换
+    function switchTab(i) {
+      contentIdx = i;
+      document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+      document.querySelector('.tab-item[data-idx="' + i + '"]').classList.add('active');
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.getElementById('tabContent_' + i).classList.add('active');
     }
 
-    $(function(){
-      $(".submit_btn,.submit_btn_backup_all,.submit_btn_backup_idx").on('click',function(e) {
+    // 日志切换
+    function changeLog(type, btn) {
+      logType = type;
+      if (btn) { document.querySelectorAll('.log-tab').forEach(t => t.classList.remove('active')); btn.classList.add('active'); }
+      const cur = logList[logType] || [];
+      const all = logList[0] || [];
+      const stats = `备份: ${all.filter(o => o.includes('正在备份项目')).length}次 · 访问: ${all.filter(o => o.includes('请求登录')).length} · 失败: ${all.filter(o => o.includes('登录失败')).length}`;
+      document.getElementById('logStats').innerHTML = stats;
+      document.getElementById('logs').innerHTML = cur.join('<br/>');
+    }
+
+    // 保存
+    $(function () {
+      $(".submit_btn,.submit_btn_backup_all,.submit_btn_backup_idx").on('click', function (e) {
         e.preventDefault();
-        $('body').animate({ scrollTop: 0 }, 300);
-        let url = "/save"
-        if(e.target.classList.contains("submit_btn_backup_all")) {
-          url += "?backupAll=true"
-        }
-        if(e.target.classList.contains("submit_btn_backup_idx")) {
-          url += "?backupIdx="+contentIdx
-        }
+        let url = "/save";
+        if (e.target.classList.contains("submit_btn_backup_all")) url += "?backupAll=true";
+        if (e.target.classList.contains("submit_btn_backup_idx")) url += "?backupIdx=" + contentIdx;
         $.ajax({
-          method: "POST",
-          url: url,
-          data: $('form').serialize(),
-          success: function (result) {
-            $('.alert').css("display", "block");
-            if (result !== "ok") {
-              $('.alert').addClass("alert-danger").removeClass("alert-success")
-              $('#resultMsg').html(result)
-            } else {
-              // ok
-              $('.alert').addClass("alert-success").removeClass("alert-danger")
-              $('#resultMsg').html("保存成功")
-              setTimeout(() => {
-                getLogs()
-              }, 800)
-              setTimeout(function(){
-                $('.alert').css("display", "none");
-              }, 3000)
-            }
+          method: "POST", url: url, data: $('#mainForm').serialize(),
+          success: function (r) {
+            var a = $('#alertBox'); a.css("display", "block");
+            if (r !== "ok") { a.removeClass("alert-success").addClass("alert-danger"); $('#resultMsg').html(r) }
+            else { a.removeClass("alert-danger").addClass("alert-success"); $('#resultMsg').html("保存成功"); setTimeout(getLogs, 800); setTimeout(() => a.css("display", "none"), 3000) }
           },
-          error: function(jqXHR) {
-            alert(jqXHR.statusText);
-          }
+          error: function (j) { alert(j.statusText) }
         })
       })
-
     })
 
-    // projectNameChange
-    function projectNameChange(that) {
-      let id = $(that).attr("id").split("_")[1]
-      let name = $(that).val()
-      let enabled = +$("#Enabled_"+id).val() === 0
-      $("#id_"+id).html(enabled ? name:name+'<span class="badge badge-pill badge-warning">停用</span>')
+    function projectNameChange(el) {
+      let id = $(el).attr("id").split("_")[1], name = $(el).val(), en = +$("#Enabled_" + id).val() === 0;
+      let btn = document.querySelector('.tab-item[data-idx="' + id + '"]');
+      btn.innerHTML = en ? name : name + '<span class="badge-disabled">停用</span>';
     }
-    // enabledChange
-    function enabledChange(that) {
-      let id = $(that).attr("id").split("_")[1]
-      let name = $("#ProjectName_"+id).val()
-      let enabled = +$(that).val() === 0
-      $("#id_"+id).html(enabled ? name:name+'<span class="badge badge-pill badge-warning">停用</span>')
+    function enabledChange(el) {
+      let id = $(el).attr("id").split("_")[1], name = $("#ProjectName_" + id).val(), en = +$(el).val() === 0;
+      let btn = document.querySelector('.tab-item[data-idx="' + id + '"]');
+      btn.innerHTML = en ? name : name + '<span class="badge-disabled">停用</span>';
     }
-  </script>
 
-  <script>
+    // 日志
     function getLogs() {
-      $.get("/logs", function(result){
-        const curList = result.split("<br/>").filter(one => one.length)
-
-        logList[0] = curList.map(one => one)
-        logList[1] = curList.filter(one => !one.includes("登录"))
-        logList[2] = curList.filter(one => one.includes("登录"))
-        
+      $.get("/logs", function (r) {
+        const cur = r.split("<br/>").filter(o => o.length);
+        logList[0] = cur; logList[1] = cur.filter(o => !o.includes("登录")); logList[2] = cur.filter(o => o.includes("登录"));
         changeLog(logType)
       })
     }
-    getLogs()
-    setInterval(getLogs, 5 * 1000)
-    $(function(){
-      $("#clearLogBtn").on("click", function(e) {
+    getLogs(); setInterval(getLogs, 5000);
+    $(function () {
+      $("#clearLogBtn").on("click", function (e) { e.preventDefault(); $.get("/clearLog", getLogs) })
+    })
+
+    // Webhook
+    $(function () {
+      $("#webhookTestBtn").on("click", function (e) {
         e.preventDefault();
         $.ajax({
-            method: "GET",
-            url: "/clearLog",
-            success: function() {
-              getLogs()
-            },
-            error: function(jqXHR) {
-              alert(jqXHR.statusText);
-            }
+          method: "POST", url: "/webhookTest", data: { URL: $("#WebhookURL").val(), RequestBody: $("#WebhookRequestBody").val() },
+          success: function () { $("#webhookTestBtn_help").text("测试成功").css("color", "#6ee7b7"); setTimeout(() => $("#webhookTestBtn_help").text(""), 5000) },
+          error: function (j) { alert(j.statusText) }
         })
       })
     })
-  </script>
 
-  <script>
-    $(function(){
-      $("#webhookTestBtn").on("click", function(e) {
-        e.preventDefault();
-        $.ajax({
-            method: "POST",
-            url: "/webhookTest",
-            data: {"URL": $("#WebhookURL").val(), "RequestBody": $("#WebhookRequestBody").val()},
-            success: function() {
-              $("#webhookTestBtn_help").text("提交模拟测试成功, 如修改记得保存配置")
-              setTimeout(function(){
-                $("#webhookTestBtn_help").text("")
-              }, 5000)
-            },
-            error: function(jqXHR) {
-              alert(jqXHR.statusText);
-            }
-          })
-      })
-    })
+    // 脚本生成器
+    function sgTypeChange(idx) {
+      const t = $('#sgType_' + idx).val();
+      const portMap = { mysql: '3306', mysql_all: '3306', postgres: '5432', postgres_all: '5432', mongodb: '27017', mongodb_all: '27017', redis: '6379', sqlite: '', file_tar: '', file_sync: '' };
+      const userMap = { mysql: 'root', mysql_all: 'root', postgres: 'postgres', postgres_all: 'postgres', mongodb: '', mongodb_all: '', redis: '', sqlite: '', file_tar: '', file_sync: '' };
+      const formatEl = $('#sgFormat_' + idx);
+      if (t === 'postgres' || t === 'postgres_all') { formatEl.html('<option value="custom">Custom 格式</option><option value="sql">SQL 格式</option>') }
+      else if (t === 'mongodb' || t === 'mongodb_all') { formatEl.html('<option value="archive">归档格式</option><option value="bson">BSON 格式</option>') }
+      else { formatEl.html('<option value="sql">SQL 格式</option><option value="custom">Custom 格式</option><option value="archive">归档格式</option>') }
+      if (portMap[t] !== undefined) $('#sgPort_' + idx).attr('placeholder', '端口 (' + portMap[t] + ')');
+      if (userMap[t] !== undefined && userMap[t]) $('#sgUser_' + idx).attr('placeholder', '用户名 (' + userMap[t] + ')');
+      // 根据类型设置占位符
+      if (t === 'file_tar' || t === 'file_sync') { $('#sgDbName_' + idx).attr('placeholder', '源路径 (/opt/data)'); $('#sgUser_' + idx).attr('placeholder', '不需要'); $('#sgHost_' + idx).attr('placeholder', '不需要') }
+      else if (t === 'sqlite') { $('#sgDbName_' + idx).attr('placeholder', '数据库文件路径'); $('#sgUser_' + idx).attr('placeholder', '不需要'); $('#sgHost_' + idx).attr('placeholder', '不需要') }
+      else if (t === 'redis') { $('#sgDbName_' + idx).attr('placeholder', 'RDB 保存路径'); $('#sgUser_' + idx).attr('placeholder', '不需要') }
+      else { $('#sgDbName_' + idx).attr('placeholder', '数据库名') }
+    }
+
+    function generateScript(idx) {
+      const t = $('#sgType_' + idx).val();
+      if (!t) { alert('请先选择数据库类型'); return }
+      const host = $('#sgHost_' + idx).val() || $('#sgHost_' + idx).attr('placeholder').replace(/.*\(|\)/g, '') || '127.0.0.1';
+      const port = $('#sgPort_' + idx).val() || $('#sgPort_' + idx).attr('placeholder').replace(/.*\(|\)/g, '') || '';
+      const user = $('#sgUser_' + idx).val() || $('#sgUser_' + idx).attr('placeholder').replace(/.*\(|\)/g, '') || '';
+      const db = $('#sgDbName_' + idx).val() || '';
+      const fmt = $('#sgFormat_' + idx).val();
+      let cmd = '';
+
+      switch (t) {
+        case 'mysql':
+          if (!db) { alert('请输入数据库名'); return }
+          cmd = `mysqldump -h${host} -P${port} -u${user} -p#{PWD} ${db} > #{DATE}.sql`; break;
+        case 'mysql_all':
+          cmd = `mysqldump -h${host} -P${port} -u${user} -p#{PWD} --all-databases > #{DATE}.sql`; break;
+        case 'postgres':
+          if (!db) { alert('请输入数据库名'); return }
+          if (fmt === 'custom') cmd = `PGPASSWORD="#{PWD}" pg_dump --host ${host} --port ${port} --user ${user} --dbname ${db} --format=custom --file #{DATE}.dump`;
+          else cmd = `PGPASSWORD="#{PWD}" pg_dump --host ${host} --port ${port} --user ${user} --dbname ${db} --file #{DATE}.sql`;
+          break;
+        case 'postgres_all':
+          cmd = `PGPASSWORD="#{PWD}" pg_dumpall --host ${host} --port ${port} --user ${user} --clean --file #{DATE}.sql`; break;
+        case 'mongodb':
+          if (!db) { alert('请输入数据库名'); return }
+          if (fmt === 'archive') cmd = `mongodump --host ${host} --port ${port} --db ${db} -u ${user} -p #{PWD} --archive=#{DATE}.archive`;
+          else cmd = `mongodump --host ${host} --port ${port} --db ${db} -u ${user} -p #{PWD} --out #{DATE}_dump`;
+          break;
+        case 'mongodb_all':
+          if (fmt === 'archive') cmd = `mongodump --host ${host} --port ${port} -u ${user} -p #{PWD} --archive=#{DATE}.archive`;
+          else cmd = `mongodump --host ${host} --port ${port} -u ${user} -p #{PWD} --out #{DATE}_dump`;
+          break;
+        case 'redis':
+          const rdbPath = db || '/var/lib/redis/dump.rdb';
+          cmd = `redis-cli -h ${host} -p ${port} -a #{PWD} BGSAVE && sleep 5 && cp ${rdbPath} #{DATE}.rdb`; break;
+        case 'sqlite':
+          if (!db) { alert('请输入数据库文件路径'); return }
+          cmd = `sqlite3 ${db} ".backup #{DATE}.db"`; break;
+        case 'file_tar':
+          if (!db) { alert('请输入源路径'); return }
+          cmd = `tar -czf #{DATE}.tar.gz ${db}`; break;
+        case 'file_sync':
+          if (!db) { alert('请输入源路径'); return }
+          cmd = `rsync -avz ${db} #{DATE}_sync/`; break;
+      }
+
+      $('#Command_' + idx).val(cmd).focus();
+      // 自动填充项目名
+      if (!$('#ProjectName_' + idx).val() && db) {
+        $('#ProjectName_' + idx).val(db.split('/').pop()).trigger('change');
+      }
+    }
   </script>
 </body>
+
 </html>

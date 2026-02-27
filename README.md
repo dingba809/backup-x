@@ -1,6 +1,6 @@
-# backup-x
+﻿# backup-x
 
-<a href="https://github.com/jeessy2/backup-x/releases/latest"><img alt="GitHub release" src="https://img.shields.io/github/release/jeessy2/backup-x.svg?logo=github&style=flat-square"></a> <img src=https://goreportcard.com/badge/github.com/jeessy2/backup-x /> <img src=https://img.shields.io/docker/image-size/jeessy/backup-x /> <img src=https://img.shields.io/docker/pulls/jeessy/backup-x /> 
+<a href="https://github.com/dingba809/backup-x/releases/latest"><img alt="GitHub release" src="https://img.shields.io/github/release/dingba809/backup-x.svg?logo=github&style=flat-square"></a> <img src=https://goreportcard.com/badge/github.com/dingba809/backup-x /> <img src=https://img.shields.io/docker/image-size/dingba809/backup-x /> <img src=https://img.shields.io/docker/pulls/dingba809/backup-x /> 
 
   带Web界面的数据库/文件备份增强工具。原理：执行自定义shell命令输出文件，增强备份功能。同时支持: 文件、mysql、postgres... [English](README-EN.md)
   - [x] 支持自定义命令
@@ -20,13 +20,13 @@
   docker run -d --name backup-x --restart=always \
     -p 9977:9977 \
     -v /opt/backup-x-files:/app/backup-x-files \
-    jeessy/backup-x
+    dingba809/backup-x
   ```
 - 登录 http://your_docker_ip:9977 并配置
 - docker容器默认安装default-mysql-client/postgres-client/[s3sync](https://github.com/jeessy2/s3sync)/rclone/wget/curl/minio mc/rsync/lz4/zstd
 
 ## 系统中使用
-- 下载并解压[https://github.com/jeessy2/backup-x/releases](https://github.com/jeessy2/backup-x/releases)
+- 下载并解压[https://github.com/dingba809/backup-x/releases](https://github.com/dingba809/backup-x/releases)
 - 安装服务
   - Mac/Linux: `./backup-x -s install` 
   - Win(打开cmd): `.\backup-x.exe -s install`
@@ -38,7 +38,7 @@
   - Win(打开cmd): `.\backup-x.exe -s uninstall`
 - 登录 http://127.0.0.1:9977 并配置
 
-  ![avatar](https://raw.githubusercontent.com/jeessy2/backup-x/master/backup-x-web.png)
+  ![avatar](https://raw.githubusercontent.com/dingba809/backup-x/master/backup-x-web.png)
 
 ## 备份脚本参考
  - postgres

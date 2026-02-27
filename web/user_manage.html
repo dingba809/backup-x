@@ -1,0 +1,657 @@
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="jie">
+    <title>Backup-X - 用户管理</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="/static/jquery-3.5.1.min.js"></script>
+    <script src="/static/bootstrap.min.js"></script>
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0f0f1a;
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+
+        /* 背景 */
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background-image: linear-gradient(rgba(255, 255, 255, .015) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, .015) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+        }
+
+        .bg-gradient {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background: radial-gradient(ellipse 80% 60% at 10% 90%, rgba(59, 130, 246, .1) 0%, transparent 70%), radial-gradient(ellipse 60% 50% at 90% 10%, rgba(139, 92, 246, .08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        /* 导航栏 */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            height: 56px;
+            background: rgba(15, 15, 26, .85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, .06);
+        }
+
+        .navbar-brand {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #fff;
+            text-decoration: none;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 20px
+        }
+
+        .nav-links a {
+            color: rgba(255, 255, 255, .5);
+            text-decoration: none;
+            font-size: .85rem;
+            font-weight: 500;
+            transition: color .2s
+        }
+
+        .nav-links a:hover {
+            color: rgba(255, 255, 255, .9)
+        }
+
+        .nav-links a.active {
+            color: #fbbf24
+        }
+
+        /* 主内容 */
+        .main-wrap {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        /* 卡片 */
+        .card {
+            background: rgba(255, 255, 255, .03);
+            border: 1px solid rgba(255, 255, 255, .06);
+            border-radius: 14px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .card-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, .06);
+            font-size: .95rem;
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        /* 按钮 */
+        .btn {
+            padding: 9px 18px;
+            border: none;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: .85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #6366f1);
+            color: #fff
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 4px 20px rgba(59, 130, 246, .35);
+            transform: translateY(-1px)
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, .1);
+            color: #fff
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, .15)
+        }
+
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: .8rem;
+            border-radius: 8px
+        }
+
+        .btn-outline-primary {
+            background: transparent;
+            border: 1px solid rgba(59, 130, 246, .4);
+            color: #93c5fd
+        }
+
+        .btn-outline-primary:hover {
+            background: rgba(59, 130, 246, .1)
+        }
+
+        .btn-outline-danger {
+            background: transparent;
+            border: 1px solid rgba(239, 68, 68, .4);
+            color: #fca5a5
+        }
+
+        .btn-outline-danger:hover {
+            background: rgba(239, 68, 68, .1)
+        }
+
+        /* 提示 */
+        .alert {
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-size: .85rem;
+            margin-bottom: 16px;
+            display: none;
+            animation: fadeIn .3s
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, .1);
+            border: 1px solid rgba(16, 185, 129, .2);
+            color: #6ee7b7
+        }
+
+        .alert-danger {
+            background: rgba(239, 68, 68, .1);
+            border: 1px solid rgba(239, 68, 68, .2);
+            color: #fca5a5
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        /* 表格 */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: .85rem;
+        }
+
+        .table th {
+            text-align: left;
+            padding: 12px 16px;
+            color: rgba(255, 255, 255, .4);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            border-bottom: 1px solid rgba(255, 255, 255, .08);
+        }
+
+        .table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, .04);
+            color: #e2e8f0;
+            vertical-align: middle;
+        }
+
+        .table tr:hover td {
+            background: rgba(255, 255, 255, .02);
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: .75rem;
+            font-weight: 500;
+        }
+
+        .badge-primary {
+            background: rgba(59, 130, 246, .15);
+            border: 1px solid rgba(59, 130, 246, .3);
+            color: #93c5fd;
+        }
+
+        .badge-secondary {
+            background: rgba(255, 255, 255, .1);
+            border: 1px solid rgba(255, 255, 255, .2);
+            color: #cbd5e1;
+        }
+
+        /* 模态框重置及样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 1050;
+            overflow: hidden;
+            outline: 0;
+        }
+
+        .modal-open .modal {
+            display: block;
+            overflow-x: hidden;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, .6);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-dialog {
+            position: relative;
+            width: auto;
+            margin: 40px auto;
+            max-width: 440px;
+        }
+
+        .modal-content {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            pointer-events: auto;
+            background: #1e1e2d;
+            border: 1px solid rgba(255, 255, 255, .1);
+            border-radius: 16px;
+            outline: 0;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, .4);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            padding: 20px 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, .06);
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+        }
+
+        .modal-title {
+            margin-bottom: 0;
+            line-height: 1.5;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+
+        .close {
+            padding: 0;
+            background: transparent;
+            border: 0;
+            float: right;
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1;
+            color: rgba(255, 255, 255, .5);
+            text-shadow: 0 1px 0 #fff;
+            opacity: .5;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #fff;
+            text-decoration: none;
+            opacity: .75;
+        }
+
+        .modal-body {
+            position: relative;
+            flex: 1 1 auto;
+            padding: 24px;
+        }
+
+        .modal-footer {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 16px 24px;
+            border-top: 1px solid rgba(255, 255, 255, .06);
+            border-bottom-right-radius: 16px;
+            border-bottom-left-radius: 16px;
+            gap: 10px;
+        }
+
+        /* 表单在模态框里 */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: .8rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, .5);
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            display: block;
+            width: 100%;
+            padding: 10px 14px;
+            font-size: .9rem;
+            line-height: 1.5;
+            color: #f1f5f9;
+            background-color: rgba(255, 255, 255, .04);
+            background-clip: padding-box;
+            border: 1px solid rgba(255, 255, 255, .1);
+            border-radius: 10px;
+            transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+            font-family: inherit;
+        }
+
+        .form-control:focus {
+            color: #f1f5f9;
+            background-color: rgba(59, 130, 246, .05);
+            border-color: rgba(59, 130, 246, .5);
+            outline: 0;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, .1);
+        }
+
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23999' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 18px;
+            padding-right: 32px;
+        }
+
+        select.form-control option {
+            background: #1e1e2d;
+            color: #e2e8f0;
+        }
+
+        /* Bootstrap modal override */
+        .modal-backdrop.show {
+            opacity: .7;
+        }
+
+        .modal {
+            transition: opacity .15s linear;
+        }
+
+        .modal.fade .modal-dialog {
+            transition: transform .3s ease-out;
+            transform: translateY(-30px);
+        }
+
+        .modal.show .modal-dialog {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-grid"></div>
+    <div class="bg-gradient"></div>
+
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">Backup-X</a>
+        <div class="nav-links">
+            <a href="/">备份管理</a>
+            <a href="/users" class="active">用户管理</a>
+            <a href="/logout">退出 ({{.CurrentUser}})</a>
+        </div>
+    </nav>
+
+    <div class="main-wrap">
+        <div class="card">
+            <div class="card-head">
+                <span>用户管理</span>
+                <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addUserModal">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                    添加用户
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="alert" id="resultAlert"><strong id="resultMsg"></strong></div>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th style="width: 30%">用户名</th>
+                            <th style="width: 30%">角色</th>
+                            <th style="width: 40%; text-align: right;">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{range .Users}}
+                        <tr>
+                            <td><strong>{{.Username}}</strong></td>
+                            <td>
+                                {{if eq .Role "admin"}}
+                                <span class="badge badge-primary">管理员</span>
+                                {{else}}
+                                <span class="badge badge-secondary">只读</span>
+                                {{end}}
+                            </td>
+                            <td style="text-align: right; gap: 8px;">
+                                <button class="btn btn-sm btn-outline-primary" style="padding: 4px 10px;"
+                                    onclick="showEditModal('{{.Username}}', '{{.Role}}')">编辑</button>
+                                <button class="btn btn-sm btn-outline-danger" style="padding: 4px 10px;"
+                                    onclick="confirmDelete('{{.Username}}')">删除</button>
+                            </td>
+                        </tr>
+                        {{end}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加用户 Modal -->
+    <div class="modal fade" id="addUserModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">添加用户</h5>
+                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>用户名</label>
+                        <input type="text" class="form-control" id="addUsername" autocomplete="off" required>
+                    </div>
+                    <div class="form-group">
+                        <label>密码</label>
+                        <input type="password" class="form-control" id="addPassword" autocomplete="new-password"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label>角色</label>
+                        <select class="form-control" id="addRole">
+                            <option value="admin">管理员</option>
+                            <option value="viewer">只读</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="addUser()">添加</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 编辑用户 Modal -->
+    <div class="modal fade" id="editUserModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">编辑用户</h5>
+                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>用户名</label>
+                        <input type="text" class="form-control" id="editUsername" readonly
+                            style="background: rgba(0,0,0,0.2); opacity: 0.7;">
+                    </div>
+                    <div class="form-group">
+                        <label>新密码 (留空则不修改)</label>
+                        <input type="password" class="form-control" id="editPassword" autocomplete="new-password">
+                    </div>
+                    <div class="form-group">
+                        <label>角色</label>
+                        <select class="form-control" id="editRole">
+                            <option value="admin">管理员</option>
+                            <option value="viewer">只读</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="updateUser()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showResult(msg, isError) {
+            $('#resultAlert').css("display", "block");
+            if (isError) {
+                $('#resultAlert').addClass("alert-danger").removeClass("alert-success");
+            } else {
+                $('#resultAlert').addClass("alert-success").removeClass("alert-danger");
+            }
+            $('#resultMsg').text(msg);
+            if (!isError) {
+                setTimeout(function () { location.reload(); }, 800);
+            } else {
+                setTimeout(function () { $('#resultAlert').css("display", "none"); }, 3000);
+            }
+        }
+
+        function addUser() {
+            var username = $('#addUsername').val().trim();
+            var password = $('#addPassword').val();
+            var role = $('#addRole').val();
+
+            if (!username || !password) {
+                alert("请输入用户名和密码");
+                return;
+            }
+
+            $.ajax({
+                method: "POST",
+                url: "/users/add",
+                data: { username: username, password: password, role: role },
+                success: function (result) {
+                    if (result === "ok") {
+                        $('#addUserModal').modal('hide');
+                        showResult("添加用户成功", false);
+                    } else {
+                        showResult(result, true);
+                    }
+                },
+                error: function (jqXHR) {
+                    alert(jqXHR.statusText);
+                }
+            });
+        }
+
+        function showEditModal(username, role) {
+            $('#editUsername').val(username);
+            $('#editPassword').val('');
+            $('#editRole').val(role);
+            $('#editUserModal').modal('show');
+        }
+
+        function updateUser() {
+            var username = $('#editUsername').val();
+            var password = $('#editPassword').val();
+            var role = $('#editRole').val();
+
+            $.ajax({
+                method: "POST",
+                url: "/users/update",
+                data: { username: username, password: password, role: role },
+                success: function (result) {
+                    if (result === "ok") {
+                        $('#editUserModal').modal('hide');
+                        showResult("更新用户成功", false);
+                    } else {
+                        showResult(result, true);
+                    }
+                },
+                error: function (jqXHR) {
+                    alert(jqXHR.statusText);
+                }
+            });
+        }
+
+        function confirmDelete(username) {
+            if (confirm("确定要删除用户 '" + username + "' 吗？")) {
+                $.ajax({
+                    method: "POST",
+                    url: "/users/delete",
+                    data: { username: username },
+                    success: function (result) {
+                        if (result === "ok") {
+                            showResult("删除用户成功", false);
+                        } else {
+                            showResult(result, true);
+                        }
+                    },
+                    error: function (jqXHR) {
+                        alert(jqXHR.statusText);
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+
+</html>
