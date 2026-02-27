@@ -32,6 +32,7 @@ func UserManagePage(writer http.ResponseWriter, request *http.Request) {
 		currentUser = sd.Username
 	}
 
+	writer.Header().Set("Content-Type", "text/html; charset=utf-8")
 	tmpl.Execute(writer, &userManageData{
 		Users:       store.Users,
 		CurrentUser: currentUser,

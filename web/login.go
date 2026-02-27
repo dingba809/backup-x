@@ -97,5 +97,6 @@ func renderLoginPage(writer http.ResponseWriter, errMsg string) {
 		log.Println(err)
 		return
 	}
+	writer.Header().Set("Content-Type", "text/html; charset=utf-8")
 	tmpl.Execute(writer, &loginData{Error: errMsg})
 }

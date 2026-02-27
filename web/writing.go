@@ -45,6 +45,7 @@ func WritingConfig(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	conf, err := entity.GetConfigCache()
+	writer.Header().Set("Content-Type", "text/html; charset=utf-8")
 	if err == nil {
 		// Pad to 16 items as in original behavior
 		for len(conf.BackupConfig) < 16 {

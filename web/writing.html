@@ -1,4 +1,5 @@
-﻿<html lang="zh-CN">
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
 
 <head>
   <meta charset="utf-8">
@@ -666,12 +667,16 @@
                       <input class="sg-input" id="sgUser_{{$i}}" placeholder="用户名 (root)">
                       <input class="sg-input" id="sgDbName_{{$i}}" placeholder="数据库名 / 文件路径">
                     </div>
-                    <div style="display:flex;gap:8px;align-items:center;margin-top:4px">
+                    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:4px">
                       <select class="sg-select" id="sgFormat_{{$i}}" style="width:auto">
                         <option value="sql">SQL 格式</option>
                         <option value="custom">Custom 格式</option>
                         <option value="archive">归档格式</option>
                       </select>
+                      <label id="sgSslLabel_{{$i}}"
+                        style="display:none;align-items:center;gap:4px;font-size:.8rem;color:rgba(255,255,255,.5);cursor:pointer;user-select:none">
+                        <input type="checkbox" id="sgDisableSsl_{{$i}}" style="cursor:pointer"> 禁用 SSL
+                      </label>
                       <button type="button" class="btn-generate" onclick="generateScript({{$i}})">生成脚本</button>
                     </div>
                   </div>
@@ -731,7 +736,8 @@
               <div>
                 <input class="form-control" name="WebhookURL" id="WebhookURL" value="{{.WebhookURL}}"
                   placeholder="https://...">
-                <div class="form-help"><a href="https://github.com/dingba809/backup-x#webhook" target="_blank">参考文档</a> |
+                <div class="form-help"><a href="https://github.com/dingba809/backup-x#webhook" target="_blank">参考文档</a>
+                  |
                   变量: #{projectName} #{fileName} #{fileSize} #{result}</div>
               </div>
             </div>
@@ -893,6 +899,10 @@
       else if (t === 'sqlite') { $('#sgDbName_' + idx).attr('placeholder', '数据库文件路径'); $('#sgUser_' + idx).attr('placeholder', '不需要'); $('#sgHost_' + idx).attr('placeholder', '不需要') }
       else if (t === 'redis') { $('#sgDbName_' + idx).attr('placeholder', 'RDB 保存路径'); $('#sgUser_' + idx).attr('placeholder', '不需要') }
       else { $('#sgDbName_' + idx).attr('placeholder', '数据库名') }
+      // 禁用 SSL 选项仅对 MySQL 显示
+      const sslLabel = $('#sgSslLabel_' + idx);
+      if (t === 'mysql' || t === 'mysql_all') { sslLabel.css('display', 'flex') }
+      else { sslLabel.hide(); $('#sgDisableSsl_' + idx).prop('checked', false) }
     }
 
     function generateScript(idx) {
@@ -905,12 +915,15 @@
       const fmt = $('#sgFormat_' + idx).val();
       let cmd = '';
 
+      const disableSsl = $('#sgDisableSsl_' + idx).is(':checked');
+      const sslFlag = disableSsl ? ' --skip-ssl' : '';
+
       switch (t) {
         case 'mysql':
           if (!db) { alert('请输入数据库名'); return }
-          cmd = `mysqldump -h${host} -P${port} -u${user} -p#{PWD} ${db} > #{DATE}.sql`; break;
+          cmd = `mysqldump -h${host} -P${port} -u${user} -p#{PWD}${sslFlag} ${db} > #{DATE}.sql`; break;
         case 'mysql_all':
-          cmd = `mysqldump -h${host} -P${port} -u${user} -p#{PWD} --all-databases > #{DATE}.sql`; break;
+          cmd = `mysqldump -h${host} -P${port} -u${user} -p#{PWD}${sslFlag} --all-databases > #{DATE}.sql`; break;
         case 'postgres':
           if (!db) { alert('请输入数据库名'); return }
           if (fmt === 'custom') cmd = `PGPASSWORD="#{PWD}" pg_dump --host ${host} --port ${port} --user ${user} --dbname ${db} --format=custom --file #{DATE}.dump`;
